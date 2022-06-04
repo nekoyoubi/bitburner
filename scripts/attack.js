@@ -2,6 +2,7 @@
 export async function main(ns) {
 	ns.print("==================================================");
 	//ns.disableLog("ALL");
+	ns.disableLog("sleep");
 	let target = ns.args.length > 0 ? ns.args[0] : ns.getHostname();
 	let threads = ns.getRunningScript().threads;
 	while (true) {
@@ -17,7 +18,7 @@ export async function main(ns) {
 		//let secOffset = minSec * .5;
 		var maxSec = minSec + 5; //secOffset;
 		//var secLevel, weakenResult, moneyNow, growResult, hackResult;
-		if (!rooted || server.hackDifficulty > player.hacking) continue;
+		if (!rooted || server.hackDifficulty > player.hacking) { await ns.sleep(5_000); continue; }
 		var ht = Math.min(Math.floor(ns.hackAnalyzeThreads(target, maxMoney / 10)), threads);
 		//var gt = Math.min(Math.floor(ns.growthAnalyze(target, 1.25, cores)), threads);
 		//var wt = ns.weakenAnalyze)target, cores);

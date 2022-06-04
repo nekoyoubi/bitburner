@@ -32,11 +32,20 @@ export async function main(ns) {
 			allowed.sort((a, b) => b.hacking - a.hacking);
 			targets = allowed.slice(0, 3).map(h => h.host);
 		}
-		let per = Math.floor((size / ns.getScriptRam("attack.js", server)) / targets.length);
-		//per = per < 1 ? 1 : per;
-		if (per == 0) return;
-		for (let t = 0; t < targets.length; t++) {
-			ns.exec("attack.js", server, per, targets[t]);
+		let per = 0;
+		for (let t = targets.length - 1; t >= 0; t--) {
+			per = Math.floor(((size - 4) / ns.getScriptRam("attack.js", server)) / targets.length);
+			if (per == 0 && targets.length > 0) {
+				targets.pop();
+				await ns.sleep(1);
+			}
+			else break;
+		}
+		if (per > 0) {
+			for (let t in targets) {
+				ns.exec("attack.js", server, per, targets[t]);
+				await ns.sleep(1);
+			}
 		}
 	}
 

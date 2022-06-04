@@ -21,8 +21,6 @@ export async function main(ns) {
 			if (target == "home") continue;
 			let server = ns.getServer(target);
 			if (!server.hasAdminRights && server.numOpenPortsRequired <= crackersOwned.length) {
-				var message = `unlocking ${target}...`;
-				ns.print(message);
 				for (let c in crackersOwned) {
 					switch (crackersOwned[c].toLowerCase()) {
 						case "brutessh" : ns.brutessh(target); break;
@@ -33,7 +31,7 @@ export async function main(ns) {
 					}
 				}
 				ns.nuke(target);
-				message = `INFO — ${target} unlocked`
+				var message = `INFO — ${target} unlocked`
 				ns.print(message)
 				ns.tprint(message);
 				ns.toast(message, "info");
@@ -42,13 +40,18 @@ export async function main(ns) {
 				var per = 0;
 				for (let t = hackTargets.length - 1; t >= 0; t--) {
 					per = Math.floor(((server.maxRam - 4) / ns.getScriptRam("attack.js", server.hostname)) / hackTargets.length);
-					if (per == 0 && hackTargets.length > 0)
+					if (per == 0 && hackTargets.length > 0) {
 						hackTargets.pop();
+						await ns.sleep(1);
+					}
 					else break;
 				}
-				if (per > 0)
-					for (let t in hackTargets)
+				if (per > 0) {
+					for (let t in hackTargets) {
 						ns.exec("attack.js", server.hostname, per, hackTargets[t]);
+						await ns.sleep(1);
+					}
+				}
 			}
 		}
 		await ns.sleep(5_000);
