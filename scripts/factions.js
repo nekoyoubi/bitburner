@@ -1,9 +1,33 @@
 /** @param {NS} ns */
 export async function main(ns) {
+	ns.disableLog("sleep");
+	let cityFactions = [ 
+		{ "group": 1, "city": "Sector-12" },
+		{ "group": 1, "city": "Aevum" },
+		{ "group": 2, "city": "Volhaven" },
+		{ "group": 3, "city": "Chongqing" },
+		{ "group": 3, "city": "New Tokyo" },
+		{ "group": 3, "city": "Ishima" }
+	];
+	let backdoorFactions = [ "CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z" ];
+	let noJoinNotify = [];
+	let cityFactionGroup = 0;
 	while (true) {
 		var message = "";
 		let invitations = ns.singularity.checkFactionInvitations();
+		let factions = ns.getPlayer().factions;
+		if (cityFactionGroup == 0)
+			cityFactionGroup = cityFactions.find(c => factions.includes(c.city))?.group ?? cityFactionGroup;
 		for (let i in invitations) {
+			let faction = invitations[i];
+			//if (cityFactions.includes(faction)) {
+			if (cityFactions.find(c => c.city == faction)?.group ?? cityFactionGroup != cityFactionGroup) {
+				if (!noJoinNotify.includes(faction)) {
+					ns.print(`FAIL — not auto-joining ${faction}`);
+					noJoinNotify.push(faction);
+				}
+				continue;
+			}
 			message = `INFO — auto-joined ${invitations[i]}`;
 			ns.singularity.joinFaction(invitations[i]);
 			ns.print(message);
@@ -12,12 +36,14 @@ export async function main(ns) {
 		}
 		/** @type {Array<ServerMap>} */
 		let map = JSON.parse(await ns.read("map.txt"));
-		let factionServers = map.filter(h => h.rooted && !h.backdoored && ["CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z"].includes(h.host))
+		let factionServers = map.filter(h => h.rooted && !h.backdoored && backdoorFactions.includes(h.host))
 		for (let s in factionServers) {
 			message = `WARN — backdooring ${factionServers[s].host} for faction invitation`
 			ns.print(message);
-			ns.singularity.connect(factionServers[s].host);
+			ns.run("goto.js", 1, factionServers[s].host);
+			await ns.sleep(1000);
 			await ns.singularity.installBackdoor();
+			ns.run("goto.js", 1, "home");
 		}
 		await ns.sleep(10_000);
 	}

@@ -9,7 +9,7 @@ export async function main(ns) {
 		ns.run("map.js"); while (!ns.fileExists("map.txt") && !ns.isRunning("map.js", "home")) await ns.sleep(50);
 		var map = JSON.parse(await ns.read("map.txt"));
 		let breakThem = map.filter(h => !h.rooted && h.hacking <= player.hacking);
-		let hackThem = map.filter(h => h.rooted && h.hacking <= player.hacking && h.maxMoney > 0);
+		let hackThem = map.filter(h => h.rooted && h.hacking <= (player.hacking * .5) && h.maxMoney > 0);
 		hackThem.sort((a, b) => b.hacking - a.hacking);
 		let hackTargets = hackThem.slice(0, 3).map(h => h.host);
 		done = map.filter(h => !h.rooted).length < 1;

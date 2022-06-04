@@ -1,9 +1,10 @@
 /** @param {NS} ns */
 export async function main(ns) {
 	let scripts = [ 
+		{ r:16, s:[ "map", ] },
 		{ r:32, s:[ "unlock", "[train]"/*"hacknet"*/ ] },
-		{ r:64, s:[ "servers/buy", ] },
-		{ r:128, s:[ "cct", "gang/ascend", "gang/justice" ] },
+		{ r:64, s:[ "servers/buy"] },
+		{ r:128, s:[ "cct", "factions", "gang/ascend", "gang/justice" ] },
 	];
 	while (scripts.length > 0) {
 		let ram = ns.getServerMaxRam("home");

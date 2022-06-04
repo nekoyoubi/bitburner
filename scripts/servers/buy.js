@@ -4,7 +4,8 @@ export async function main(ns) {
 	let maxServers = 25;//ns.getPurchasedServerLimit();
 	let baseCost = 55_000;
 	let minSize = 8;
-	let maxUpgrade = ns.getPurchasedServerMaxRam(); //65536;
+	let maxUpgrade = 32768; //ns.getPurchasedServerMaxRam(); // 65536 // 32768 // 16384 // 8192 // 4096 // 2048 // 1024 // 512 // 256;
+	ns.print(`Maximum server upgrade: ${maxUpgrade} for ${ns.nFormat(baseCost * maxUpgrade, "$(0.0a)")}`);
 	while (!ns.fileExists("map.txt") && !ns.isRunning("map.js", "home")) await ns.sleep(50);
 
 	/** @param {number} money */
@@ -18,6 +19,7 @@ export async function main(ns) {
 	 *  @param {number} size
 	 *	@param {Player} player */
 	let newServer = async function (server, size, player) {
+		while (!ns.serverExists(server)) await ns.sleep(10);
 		await ns.scp("attack.js", server);
 		await ns.scp("goto.js", server);
 		let targetFile = await ns.read("target.txt");
@@ -28,13 +30,13 @@ export async function main(ns) {
 		} else {
 			/** @type {Array<ServerMap>} */
 			let map = JSON.parse(await ns.read("map.txt"));
-			let allowed = map.filter(h => h.rooted && h.hacking <= player.hacking && h.maxMoney > 0);
+			let allowed = map.filter(h => h.rooted && h.hacking <= (player.hacking * .5) && h.maxMoney > 0);
 			allowed.sort((a, b) => b.hacking - a.hacking);
-			targets = allowed.slice(0, 3).map(h => h.host);
+			targets = allowed.slice(0, attackScale(size)).map(h => h.host);
 		}
 		let per = 0;
 		for (let t = targets.length - 1; t >= 0; t--) {
-			per = Math.floor(((size - 4) / ns.getScriptRam("attack.js", server)) / targets.length);
+			per = Math.floor((size / ns.getScriptRam("attack.js", server)) / targets.length);
 			if (per == 0 && targets.length > 0) {
 				targets.pop();
 				await ns.sleep(1);
@@ -61,29 +63,39 @@ export async function main(ns) {
 				size = getServerSize(player.money);
 				if (size == undefined || size <= current) continue;
 				if (current >= maxUpgrade) { maxed++; continue; }
-				ns.killall(server);
-				ns.deleteServer(server);
-				ns.purchaseServer(server, size);
-				let message = `INFO — ${server} updated to ${size}GB for ${ns.nFormat(size * baseCost, "$(0.0a)")}`;
+				while (!ns.deleteServer(server)) {
+					ns.killall(server);
+					await ns.sleep(100);
+				}
+				//await ns.sleep(10);
+				while (ns.purchaseServer(server, size) != "") {
+					await ns.sleep(100);
+				}
+				await ns.sleep(10);
+				let message = `INFO — [${now(true)}] ${server} upgraded to ${size}GB for ${ns.nFormat(size * baseCost, "$(0.0a)")}`;
 				ns.print(message);
 				//ns.tprint(message);
-				ns.toast(message);
+				ns.toast(message.replace(message.match(/\s\[.+?\]/g), ""));
 				await newServer(server, size, player);
 			} else {
 				size = getServerSize(player.money);
 				if (size == undefined) continue;
 				ns.purchaseServer(server, size);
-				let message = `INFO — ${server} purchased with ${size}GB for ${ns.nFormat(size * baseCost, "$(0.0a)")}`;
+				await ns.sleep(10);
+				let message = `INFO — [${now(true)}] ${server} purchased with ${size}GB for ${ns.nFormat(size * baseCost, "$(0.0a)")}`;
 				ns.print(message);
 				//ns.tprint(message);
-				ns.toast(message);
+				ns.toast(message.replace(message.match(/\s\[.+?\]/g), ""));
 				await newServer(server, size, player);
 			}
 		}
-		await ns.sleep(60_000);
+		await ns.sleep(20_000);
 	}
 }
 
+function now(timeOnly) { return (new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60 * 1000))).toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ").replace(/^(\S+?)\s/g, timeOnly ? "" : "\$1 "); }
+
+function attackScale(size) { return Math.max(Math.floor(Math.pow(Math.log(size) - 2, 1.25)) + 1, 1); }
 
 /**
  * @typedef ServerMap

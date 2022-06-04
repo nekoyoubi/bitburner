@@ -10,7 +10,7 @@ export async function main(ns) {
 	if (targets[0].toLowerCase().match(/all|burn/i) != null) {
 		while (!ns.fileExists("map.txt") && !ns.isRunning("map.js", "home")) await ns.sleep(50);
 		var map = JSON.parse(await ns.read("map.txt"));
-		targets = map.filter(h => h.rooted && h.hacking <= skill && h.maxMoney > 0).map(h => h.host);	
+		targets = map.filter(h => h.rooted && h.hacking <= (skill * .5) && h.maxMoney > 0).map(h => h.host);	
 	}
 	else
 		targets = targets.filter(t => ns.getServerRequiredHackingLevel(t) <= skill);
@@ -22,7 +22,7 @@ export async function main(ns) {
 		let script = isBurn ? burn : attack;
 		await ns.scp(script, name);
 		let ram = ns.getServerMaxRam(name) - ns.getServerUsedRam(name);
-		let per = Math.floor((ram / ns.getScriptRam(script, name)) / targets.length);
+		let per = Math.floor(((ram - 4) / ns.getScriptRam(script, name)) / targets.length);
 		per = per < 1 ? 1 : per;
 		for (let t = 0; t < targets.length; t++) {
 			ns.print(`running ${script} on ${name} with ${per} threads against ${targets[t]}`);
