@@ -18,7 +18,7 @@ void Main()
 	var content = Encoding.UTF8.GetString(Convert.FromBase64String(File.ReadAllText(recent.FullName)));
 	var found = Regex.Match(content, @"\\""karma\\"":(-?[\d\.]+)", RegexOptions.IgnoreCase).Groups[1].Value;
 	Util.Metatext($"replacing {found} karma with -53900").Dump();
-	content = Regex.Replace(content, @"\\""karma\\"":-?[\d\.]+", @"\""karma\"":-54900");
+	content = Regex.Replace(content, @"\\""karma\\"":-?[\d\.]+", @"\""karma\"":-53900");
 	var newFile = Path.Combine(Path.GetDirectoryName(recent.FullName), $"{Path.GetFileNameWithoutExtension(recent.FullName)}_GU");
 	File.WriteAllText(newFile, Convert.ToBase64String(Encoding.UTF8.GetBytes(content)));
 	File.SetCreationTime(newFile, recent.CreationTime);

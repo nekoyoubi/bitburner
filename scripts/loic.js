@@ -15,7 +15,7 @@ export async function main(ns) {
 	else
 		targets = targets.filter(t => ns.getServerRequiredHackingLevel(t) <= skill);
 	let servers = ns.getPurchasedServers();
-	for (let s = 1; s <= servers.length; s++) {
+	for (let s = 0; s < servers.length; s++) {
 		let name = `s${ns.nFormat(s, "00")}`;
 		if (!ns.serverExists(name)) continue;
 		ns.killall(name, true);
