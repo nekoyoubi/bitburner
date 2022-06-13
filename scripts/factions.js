@@ -9,8 +9,9 @@ export async function main(ns) {
 		{ "group": 3, "city": "New Tokyo" },
 		{ "group": 3, "city": "Ishima" }
 	];
-	let backdoorFactions = [ "CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z" ];
-	let noJoinNotify = [];
+	let backdoorServers = [ "CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z" ];
+	let autoHackFactions = [ "CyberSec", "NiteSec", "Tian Di Hui", "The Black Hand", "BitRunners", "Daedalus" ];
+	//let noJoinNotify = [];
 	let cityFactionGroup = 0;
 	while (true) {
 		var message = "";
@@ -20,23 +21,27 @@ export async function main(ns) {
 			cityFactionGroup = cityFactions.find(c => factions.includes(c.city))?.group ?? cityFactionGroup;
 		for (let i in invitations) {
 			let faction = invitations[i];
-			//if (cityFactions.includes(faction)) {
-			if (cityFactions.find(c => c.city == faction)?.group ?? cityFactionGroup != cityFactionGroup) {
-				if (!noJoinNotify.includes(faction)) {
-					ns.print(`FAIL — not auto-joining ${faction}`);
-					noJoinNotify.push(faction);
-				}
+			let city = cityFactions.find(c => c.city == faction);
+			if (city != undefined && city.group != cityFactionGroup)// {
+			//if (cityFactions.find(c => c.city == faction)?.group ?? cityFactionGroup != cityFactionGroup) {
+				//if (!noJoinNotify.includes(faction)) {
+				//	ns.print(`FAIL — not auto-joining ${faction}`);
+				//	noJoinNotify.push(faction);
+				//}
 				continue;
+			//}
+			message = `INFO — auto-joined ${faction}`;
+			ns.singularity.joinFaction(faction);
+			if (autoHackFactions.includes(faction)) {
+				ns.singularity.workForFaction(faction, "Hacking Contracts", ns.singularity.isFocused());
 			}
-			message = `INFO — auto-joined ${invitations[i]}`;
-			ns.singularity.joinFaction(invitations[i]);
 			ns.print(message);
 			ns.tprint(message);
 			ns.toast(message);
 		}
 		/** @type {Array<ServerMap>} */
 		let map = JSON.parse(await ns.read("map.txt"));
-		let factionServers = map.filter(h => h.rooted && !h.backdoored && backdoorFactions.includes(h.host))
+		let factionServers = map.filter(h => h.rooted && !h.backdoored && backdoorServers.includes(h.host))
 		for (let s in factionServers) {
 			message = `WARN — backdooring ${factionServers[s].host} for faction invitation`
 			ns.print(message);

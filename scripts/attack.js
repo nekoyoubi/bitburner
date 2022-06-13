@@ -20,7 +20,7 @@ export async function main(ns) {
 		//var secLevel, weakenResult, moneyNow, growResult, hackResult;
 		if (!rooted || server.hackDifficulty > player.hacking) { await ns.sleep(5_000); continue; }
 		var ht = Math.min(Math.floor(ns.hackAnalyzeThreads(target, maxMoney / 10)), threads);
-		//var gt = Math.min(Math.floor(ns.growthAnalyze(target, 1.25, cores)), threads);
+		var gt = Math.min(Math.floor(ns.growthAnalyze(target, 1.5, cores)), threads);
 		//var wt = ns.weakenAnalyze)target, cores);
 		ns.print(`WARN — [ ${ns.nFormat(moneyNow, "0,0.0a")} / ${ns.nFormat(maxMoney, "0,0.0a")} (S:${ns.nFormat(secLevel, "0.0")} / ${ns.nFormat(minSec, "0.0")}) ]`);
 		if (secLevel > maxSec) {
@@ -30,7 +30,7 @@ export async function main(ns) {
 		}
 		else if (moneyNow < minMoney) {
 			//growResult = 
-			await ns.grow(target, { threads: threads/*gt*/ });
+			await ns.grow(target, { threads: /*threads*/gt });
 			//ns.print(`grow -> ${(growResult-1)*100}%`);
 		}
 		else {

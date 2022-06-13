@@ -1,25 +1,36 @@
 /** @param {NS} ns */
 export async function main(ns) {
-	ns.disableLog("ALL");
+	ns.disableLog("sleep");
+	ns.disableLog("exec");
+	ns.disableLog("getServerMaxRam");
+	ns.disableLog("scp");
 	let maxServers = 25;//ns.getPurchasedServerLimit();
-	let baseCost = 55_000;
+	let baseCost = 110_000;
 	let minSize = 8;
-	let maxUpgrade = 32768; //ns.getPurchasedServerMaxRam(); // 65536 // 32768 // 16384 // 8192 // 4096 // 2048 // 1024 // 512 // 256;
+	let maxUpgrade = ns.getPurchasedServerMaxRam(); // 65536 // 32768 // 16384 // 8192 // 4096 // 2048 // 1024 // 512 // 256;
 	ns.print(`Maximum server upgrade: ${maxUpgrade} for ${ns.nFormat(baseCost * maxUpgrade, "$(0.0a)")}`);
-	while (!ns.fileExists("map.txt") && !ns.isRunning("map.js", "home")) await ns.sleep(50);
+	while (!ns.fileExists("map.txt")) await ns.sleep(50);
 
 	/** @param {number} money */
 	let getServerSize = function (money) {
 		for (let r = maxUpgrade; r >= minSize; r /= 2) 
-			if (r * baseCost >= money * .25) continue;
-			else return r;
+			if (ns.getPurchasedServerCost(r) > money * .25) continue;
+			else { minSize = r; return r };
 	}
 
 	/** @param {string} server
 	 *  @param {number} size
 	 *	@param {Player} player */
 	let newServer = async function (server, size, player) {
-		while (!ns.serverExists(server)) await ns.sleep(10);
+		while (ns.serverExists(server)) { await ns.sleep(100); }
+		//while (!ns.serverExists(server)) {
+		ns.purchaseServer(server, size);
+			//await ns.sleep(1_000);
+			//if (!ns.serverExists(server))
+			//	await ns.sleep(10_000);
+		//}
+		await ns.sleep(10);
+		while (!ns.serverExists(server)) await ns.sleep(100);
 		await ns.scp("attack.js", server);
 		await ns.scp("goto.js", server);
 		let targetFile = await ns.read("target.txt");
@@ -50,46 +61,39 @@ export async function main(ns) {
 			}
 		}
 	}
-
+	
 	var maxed = 0;
 	while (maxed < maxServers) {
 		maxed = 0;
 		for (let s = 0; s < maxServers; s++) {
 			let server = `s${ns.nFormat(s, "00")}`;
 			let player = ns.getPlayer();
-			var size = 0;
+			var size = getServerSize(player.money);
+			if (size == undefined) break;
+			var cost = ns.getPurchasedServerCost(size);
 			if (ns.serverExists(server)) {
 				let current = ns.getServerMaxRam(server);
-				size = getServerSize(player.money);
-				if (size == undefined || size <= current) continue;
 				if (current >= maxUpgrade) { maxed++; continue; }
-				while (!ns.deleteServer(server)) {
+				if (size == undefined || (size != maxUpgrade && size <= current * 4)) continue;
+				while (!ns.deleteServer(server) && ns.serverExists(server)) {
 					ns.killall(server);
 					await ns.sleep(100);
 				}
-				//await ns.sleep(10);
-				while (ns.purchaseServer(server, size) != "") {
-					await ns.sleep(100);
-				}
-				await ns.sleep(10);
-				let message = `INFO — [${now(true)}] ${server} upgraded to ${size}GB for ${ns.nFormat(size * baseCost, "$(0.0a)")}`;
+				let message = `INFO — [${now(true)}] upgrading ${server} to ${size}GB for ${ns.nFormat(cost, "$(0.0a)")}`;
 				ns.print(message);
 				//ns.tprint(message);
 				ns.toast(message.replace(message.match(/\s\[.+?\]/g), ""));
-				await newServer(server, size, player);
 			} else {
-				size = getServerSize(player.money);
-				if (size == undefined) continue;
-				ns.purchaseServer(server, size);
-				await ns.sleep(10);
-				let message = `INFO — [${now(true)}] ${server} purchased with ${size}GB for ${ns.nFormat(size * baseCost, "$(0.0a)")}`;
+				//ns.purchaseServer(server, size);
+				//await ns.sleep(10);
+				let message = `INFO — [${now(true)}] purchasing ${server} with ${size}GB for ${ns.nFormat(cost, "$(0.0a)")}`;
 				ns.print(message);
 				//ns.tprint(message);
 				ns.toast(message.replace(message.match(/\s\[.+?\]/g), ""));
-				await newServer(server, size, player);
 			}
+			await newServer(server, size, player);
 		}
-		await ns.sleep(20_000);
+		await ns.sleep(1_000);
 	}
 }
 

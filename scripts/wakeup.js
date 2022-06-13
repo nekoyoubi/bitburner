@@ -2,8 +2,8 @@
 export async function main(ns) {
 	let scripts = [ 
 		{ r:16, s:[ "map", ] },
-		{ r:32, s:[ "unlock", "[train]"/*"hacknet"*/ ] },
-		{ r:64, s:[ "servers/buy"] },
+		{ r:32, s:[ "unlock", "[train]", "servers/buy", /*"hacknet"*/ ] },
+		{ r:64, s:[  "darkweb", "ui/overview" ] },
 		{ r:128, s:[ "cct", "factions", "gang/ascend", "gang/justice" ] },
 	];
 	while (scripts.length > 0) {

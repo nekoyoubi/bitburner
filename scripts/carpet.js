@@ -6,13 +6,13 @@ export async function main(ns) {
 	let mapFile = "map.txt";
 	//if (!ns.fileExists(mapFile))
 	ns.run("map.js");
-	while (!ns.fileExists(mapFile) && !ns.isRunning("map.js", "home")) await ns.sleep(50);
+	while (!ns.fileExists(mapFile)) await ns.sleep(50);
 	var map = JSON.parse(await ns.read(mapFile));
 	let hackingLevel = ns.getHackingLevel();
 	var targets = map.filter(m =>
 		!exclusions.includes(m.host) &&
 		m.rooted &&
-		m.hacking <= hackingLevel &&
+		m.hacking <= (hackingLevel * .5) &&
 		m.maxMoney > 0);
 	targets.sort((a,b) => b.maxMoney - a.maxMoney);
 	ns.scriptKill(attack, ns.getHostname());

@@ -6,7 +6,8 @@ export async function main(ns) {
 		var crackers = [ "BruteSSH", "FTPCrack", "relaySMTP", "HTTPWorm", "SQLInject" ];
 		let crackersOwned = crackers.filter(c => ns.fileExists(`${c}.exe`, "home"));
 		let player = ns.getPlayer();
-		ns.run("map.js"); while (!ns.fileExists("map.txt") && !ns.isRunning("map.js", "home")) await ns.sleep(50);
+		//ns.run("map.js");
+		while (!ns.fileExists("map.txt")) await ns.sleep(50);
 		var map = JSON.parse(await ns.read("map.txt"));
 		let breakThem = map.filter(h => !h.rooted && h.hacking <= player.hacking);
 		let hackThem = map.filter(h => h.rooted && h.hacking <= (player.hacking * .5) && h.maxMoney > 0);
@@ -31,7 +32,7 @@ export async function main(ns) {
 					}
 				}
 				ns.nuke(target);
-				var message = `INFO — ${target} unlocked`
+				var message = `INFO — [${server.requiredHackingSkill}] ${target} unlocked; ${server.maxRam}GB, ${ns.nFormat(server.moneyMax, "$0.0a")}, 🔒 ${server.hackDifficulty}/${server.minDifficulty}`
 				ns.print(message)
 				ns.tprint(message);
 				ns.toast(message, "info");
