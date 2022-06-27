@@ -4,11 +4,11 @@ export async function main(ns) {
 	ns.disableLog("exec");
 	ns.disableLog("getServerMaxRam");
 	ns.disableLog("scp");
-	let maxServers = 25;//ns.getPurchasedServerLimit();
-	let baseCost = 110_000;
+	let maxServers = ns.getPurchasedServerLimit();
+	//let baseCost = 110_000;
 	let minSize = 8;
 	let maxUpgrade = ns.getPurchasedServerMaxRam(); // 65536 // 32768 // 16384 // 8192 // 4096 // 2048 // 1024 // 512 // 256;
-	ns.print(`Maximum server upgrade: ${maxUpgrade} for ${ns.nFormat(baseCost * maxUpgrade, "$(0.0a)")}`);
+	//ns.print(`Maximum server upgrade: ${maxUpgrade} for ${ns.nFormat(baseCost * maxUpgrade, "$(0.0a)")}`);
 	while (!ns.fileExists("map.txt")) await ns.sleep(50);
 
 	/** @param {number} money */

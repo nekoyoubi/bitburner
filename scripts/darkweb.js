@@ -6,7 +6,7 @@ export async function main(ns) {
 		{ "program": "FTPCrack",		"priority": 1, "cost": 1_500_000,		"ratio": 1 },
 		{ "program": "relaySMTP",		"priority": 1, "cost": 5_000_000,		"ratio": 1 },
 		{ "program": "HTTPWorm",		"priority": 2, "cost": 30_000_000,		"ratio": .5 },
-		{ "program": "SQLInject",		"priority": 3, "cost": 250_000_000,		"ratio": .25 },
+		{ "program": "SQLInject",		"priority": 3, "cost": 250_000_000,		"ratio": .5 },
 		{ "program": "AutoLink",		"priority": 2, "cost": 1_000_000,		"ratio": .1 },
 		{ "program": "DeepScanv1",		"priority": 2, "cost": 500_000,			"ratio": .5 },
 		{ "program": "DeepScanv2",		"priority": 3, "cost": 25_000_000,		"ratio": .1 },

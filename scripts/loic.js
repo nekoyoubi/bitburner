@@ -8,7 +8,7 @@ export async function main(ns) {
 	let targetOverride = await ns.read("target.txt");
 	if (targetOverride.length > 0) targets = [ ...targetOverride.match(/[^,;\s]+/g) ];
 	if (targets[0].toLowerCase().match(/all|burn/i) != null) {
-		while (!ns.fileExists("map.txt") && !ns.isRunning("map.js", "home")) await ns.sleep(50);
+		while (!ns.fileExists("map.txt")) await ns.sleep(50);
 		var map = JSON.parse(await ns.read("map.txt"));
 		targets = map.filter(h => h.rooted && h.hacking <= (skill * .5) && h.maxMoney > 0).map(h => h.host);	
 	}
@@ -28,6 +28,6 @@ export async function main(ns) {
 			ns.print(`running ${script} on ${name} with ${per} threads against ${targets[t]}`);
 			ns.exec(script, name, per, targets[t]);
 		}
-		await ns.sleep(1_000);
+		await ns.sleep(1);
 	}
 }

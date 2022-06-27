@@ -11,7 +11,6 @@ export async function main(ns) {
 	];
 	let backdoorServers = [ "CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z" ];
 	let autoHackFactions = [ "CyberSec", "NiteSec", "Tian Di Hui", "The Black Hand", "BitRunners", "Daedalus" ];
-	//let noJoinNotify = [];
 	let cityFactionGroup = 0;
 	while (true) {
 		var message = "";
@@ -22,17 +21,11 @@ export async function main(ns) {
 		for (let i in invitations) {
 			let faction = invitations[i];
 			let city = cityFactions.find(c => c.city == faction);
-			if (city != undefined && city.group != cityFactionGroup)// {
-			//if (cityFactions.find(c => c.city == faction)?.group ?? cityFactionGroup != cityFactionGroup) {
-				//if (!noJoinNotify.includes(faction)) {
-				//	ns.print(`FAIL — not auto-joining ${faction}`);
-				//	noJoinNotify.push(faction);
-				//}
+			if (city != undefined && city.group != cityFactionGroup)
 				continue;
-			//}
 			message = `INFO — auto-joined ${faction}`;
 			ns.singularity.joinFaction(faction);
-			if (autoHackFactions.includes(faction)) {
+			if (autoHackFactions.includes(faction) && !ns.singularity.isBusy) {
 				ns.singularity.workForFaction(faction, "Hacking Contracts", ns.singularity.isFocused());
 			}
 			ns.print(message);
