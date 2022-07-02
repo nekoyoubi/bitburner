@@ -9,10 +9,10 @@ export async function main(ns) {
 		for (let s in sleeves) {
 			let sleeve = sleeves[s];
 			let stats = ns.sleeve.getSleeveStats(s);
-			if (stats.sync < 100)
-				ns.sleeve.setToSynchronize(s);
-			else if (stats.shock < 100)
+			if (stats.shock < 100)
 				ns.sleeve.setToShockRecovery(s);
+			else if (stats.sync < 100)
+				ns.sleeve.setToSynchronize(s);
 			// else
 			// 	ns.tprint(`Sleeve ${s} is ready`)
 		}

@@ -3,8 +3,9 @@ export async function main(ns) {
 	let scripts = [ 
 		{ r:16, s:[ "map", ] },
 		{ r:32, s:[ "unlock", "[train]", /*"hacknet"*/ ] },
-		{ r:64, s:[ "servers/buy", "darkweb", "ui/overview", ] },
-		{ r:128, s:[ "cct", "factions", "gang/manage", /*"gang/ascend", "gang/justice"*/ ] },
+		{ r:64, s:[ /*"servers/buy", "darkweb",*/ "ui/overview", ] },
+		{ r:128, s:[ "cct", "factions", "gang/manage", ] },
+		{ r:256, s:[ "bladeburner", ] },
 	];
 	while (scripts.length > 0) {
 		let ram = ns.getServerMaxRam("home");

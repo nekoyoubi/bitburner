@@ -3,12 +3,18 @@ const doc = eval("document");
 /** @param {NS} ns */
 export async function main(ns) {
 	ns.disableLog("sleep");
+	ns.clearLog();
 	
-	let overviewSelector = "#root > div > div div.MuiCollapse-root > div > div > table > tbody >";
-	let hpElements = doc.querySelectorAll(`${overviewSelector} tr:nth-child(1) p`);
-	let intOffset = Math.min(ns.getPlayer().intelligence+1, 2);
-	let anchorText = doc.querySelector(`${overviewSelector} tr:nth-child(${14+intOffset})`);
-	let anchorBar = doc.querySelector(`${overviewSelector} tr:nth-child(${15+intOffset})`);
+	let rootSelector = "#root > div";
+	let overviewSelectorBase = `${rootSelector} > div.MuiPaper-root > div.MuiCollapse-root`;
+	let overviewSelectorTable = `${overviewSelectorBase} > div > div > table`;
+	let overviewSelectorTBody = `${overviewSelectorTable} > tbody`;
+	let mainWindowSelector = `${rootSelector} > div.MuiBox-root > div.MuiBox-root`;
+	let overviewCollapsedSelector = `${overviewSelectorBase}.MuiCollapse-hidden`;
+	let hpElements = doc.querySelectorAll(`${overviewSelectorTBody} > tr:nth-child(1) p`);
+	let intOffset = Math.min(ns.getPlayer().intelligence + 1, 2);
+	let anchorText = doc.querySelector(`${overviewSelectorTBody} > tr:nth-child(${14 + intOffset})`);
+	let anchorBar = doc.querySelector(`${overviewSelectorTBody} > tr:nth-child(${15 + intOffset})`);
 	
 	var refresh = true;
 
@@ -27,6 +33,7 @@ export async function main(ns) {
 
 	let getStat = function(stat, track) {
 		var value = 0;
+		ns.print(stat);
 		switch (stat) {
 			//case "int": value = ns.getPlayer().intelligence; break;
 			case "kar":
@@ -43,8 +50,9 @@ export async function main(ns) {
 					}
 				}
 				break;
+			case "ter": value = ns.gang.getGangInformation().territory; break;
 		}
-		let thisStat = stats.find(s => s.stat == stat);
+		let thisStat = allStats.find(s => s.stat == stat);
 		if (thisStat.lastValue != value) refresh = true;
 		thisStat.lastValue = value;
 		return value;
@@ -67,37 +75,55 @@ export async function main(ns) {
 				//value = value <= -54_000 ? value : `${hours}:${`${minutes} ${ns.nFormat((value/-54_000), "0%")}`}`;
 				value = `${hours}:${ns.nFormat(minutes, "00")}:${ns.nFormat(seconds, "00")}`;
 				break;
+			case "ter":
+				let t = ns.gang.getGangInformation().territory;
+				value = ns.nFormat(t, `0%`);//`0${(t >= 1 ? "" : ".00")}%`)}`;
+				break;
 		}
 		return value;
 	}
 
-	let stats = [
-		{ "stat": "kar", "label": "Kar", "color":"#C83700", "lastValue": 0, "barValue": -54000, "element": undefined, "bar": undefined },
+	let allStats = [
+		{ "stat": "kar", "label": "Kar", "color":"#C83700", "lastValue": 0, "barValue": -54000, "element": undefined, "bar": undefined, "condition": () => !ns.gang.inGang() },
+		{ "stat": "ter", "label": "Ter", "color":"#966633", "lastValue": 0, "barValue": 1, "element": undefined, "bar": undefined, "condition": () => ns.gang.inGang() },
 		// I lol'd; this already exists in the game (nearly identical too)
 		//{ "stat": "int", "label": "Int", "color":"#49A0FF", "lastValue": 0, "barValue": null, "element": undefined, "bar": undefined },
-	];
-		
+	].reverse();
+	
 	for (let h in hpElements)
 		if (hpElements[h].style != undefined)
 	 		hpElements[h].style.cssText = "color:#F69 !important;";
 
 	ns.atExit(() => {
-		for (let s in stats) {
-			stats[s].element.remove();
-			if (stats[s].bar != undefined)
-				stats[s].bar.remove();
+		for (let s in allStats) {
+			allStats[s].element?.remove();
+			if (allStats[s].bar != undefined)
+				allStats[s].bar.remove();
 		}
 		for (let h in hpElements)
 			if (hpElements[h].style != undefined)
 				hpElements[h].style.cssText = "";
+		doc.querySelector(mainWindowSelector).style = `margin-right: 0;`;
+		doc.querySelector(overviewSelectorTable).style = "";
 	});
 
 	while (true) {
+		await ns.sleep(1000);
+		let tableElement = doc.querySelector(overviewSelectorTable);
+		if (tableElement != undefined)
+			tableElement.style = "max-width: 200px";
+		let mainWindow = doc.querySelector(mainWindowSelector);
+		if (mainWindow != undefined)
+			mainWindow.style = (doc.querySelector(overviewCollapsedSelector) == undefined)
+				? `margin-right: ${doc.querySelector(overviewSelectorBase).offsetWidth}px !important;`
+				: "margin-right: 0;";
+		let stats = allStats.filter(s => s.condition())
 		for (let s in stats) getStat(stats[s].stat, true);
 		if (refresh) {
 			for (let s in stats) {
-				if (stats[s].element != undefined) stats[s].element.remove();
-				if (stats[s].bar != undefined) stats[s].bar.remove();
+				if (stats[s].element != undefined || !stats[s].condition()) stats[s].element.remove();
+				if (stats[s].bar != undefined || !stats[s].condition()) stats[s].bar.remove();
+				if (!stats[s].condition()) continue;
 				var textHtml = anchorText.outerHTML
 					.replace(new RegExp(`/"overview-${intOffset > 0 ? "int" : "cha"}-hook"/`,"gi"), `"overview-${stats[s].stat}-hook"`)
 					.replace(new RegExp(`>${intOffset > 0 ? "Int" : "Cha"}`,"g"), `>${stats[s].label}`)
@@ -117,7 +143,6 @@ export async function main(ns) {
 				}
 			}
 		}
-		await ns.sleep(1000);
 	}
 }
 

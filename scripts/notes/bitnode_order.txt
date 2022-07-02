@@ -1,0 +1,21 @@
+[
+	{ "bn": 1.1,	"note": "I didn't know any better... you got me!" },
+	{ "bn": 1.2,	"note": "... still didn't know any better... [-.-]" },
+	{ "bn": 2.1,	"note": "gangs sounded pretty fun" },
+	{ "bn": 4.1,	"note": "needed more to code on about; what a sales pitch" },
+	{ "bn": 4.2,	"note": "... realized the RAM penalty" },
+	{ "bn": 4.3,	"note": "... can't... stop... now... almost... there..." },
+	{ "bn": 5.1,	"note": "not getting access to INT early would be silly" },
+	{ "bn": 10.1,	"note": "gangs made me do it... mostly" },
+	{ "bn": 6.1,	"note": "a new mechanic with more reason to punch things in a text game; sounded fun" },
+	{ "bn": 7.1,	"note": "... was fun... this though? at least it'll be useful later" },
+
+	{ "bn": 9.1,	"note": "really need hacknet to be more than wasted sidebar space" },
+	{ "bn": 9.2,	"note": "... also, 128GB starting out sounds nice, but probably isn't worth" },
+	{ "bn": 8.1,	"note": "I've feared this from the beginning... ez-mode WSE/TIX though, amirite?!" },
+	{ "bn": 8.2,	"note": "don't want, but need the short sell and server growth rate for 11.1" },
+	{ "bn": 8.3,	"note": "still don't want, but need the limit orders and server growth rate" },
+	{ "bn": 11.1,	"note": "rep++ and making a salary mechanic a thing sounds fun enough; probably won't be" },
+	{ "bn": 3.1,	"note": "fine, I'll go make the easy money..." },
+	{ "bn": 13.1,	"note": "what... _IS_ this?" }
+]
