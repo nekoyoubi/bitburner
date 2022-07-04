@@ -18,9 +18,13 @@ export async function main(ns) {
 		//let secOffset = minSec * .5;
 		var maxSec = minSec + 5; //secOffset;
 		//var secLevel, weakenResult, moneyNow, growResult, hackResult;
-		if (!rooted || server.hackDifficulty > player.hacking) { await ns.sleep(5_000); continue; }
-		var ht = Math.min(Math.max(Math.floor(ns.hackAnalyzeThreads(target, maxMoney / 20)), 1), threads);
-		var gt = Math.min(Math.floor(ns.growthAnalyze(target, 1.5, cores)), threads);
+		if (!rooted) { await ns.sleep(5_000); continue; }
+		//else if (server.hackDifficulty > player.hacking) {
+		//	await ns.sleep(5_000);
+		//	continue;
+		//}
+		var ht = Math.min(Math.max(Math.floor(ns.hackAnalyzeThreads(target, maxMoney / 4/*20*/)), 1), threads);
+		var gt = Math.min(Math.floor(ns.growthAnalyze(target, 4/*1.5*/, cores)), threads);
 		//var wt = ns.weakenAnalyze)target, cores);
 		ns.print(`WARN — [ ${ns.nFormat(moneyNow, "0,0.0a")} / ${ns.nFormat(maxMoney, "0,0.0a")} (S:${ns.nFormat(secLevel, "0.0")} / ${ns.nFormat(minSec, "0.0")}) ]`);
 		if (secLevel > maxSec) {

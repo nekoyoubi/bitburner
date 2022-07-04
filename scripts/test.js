@@ -1,7 +1,8 @@
 /** @param {NS} ns */
 export async function main(ns) {
+	ns.tprint(ns.bladeburner.getActionEstimatedSuccessChance("BlackOp", "Operation X"));
 	//let otherGangs = ns.gang.getOtherGangInformation();
-	ns.tprint(ns.bladeburner.getGeneralActionNames());
+	//ns.tprint(`${ns.nFormat(ns.bladeburner.getCityEstimatedPopulation("Aevum"), "0,0")}`);
 	//ns.tprint(ns.getPlayer().workType);
 	//var gang = null;
 	//let getGang = function () { try { gang = ns.gang.getGangInformation(); } catch { gang = null;} return gang != null; };

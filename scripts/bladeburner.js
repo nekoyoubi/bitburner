@@ -4,10 +4,12 @@ export async function main(ns) {
 	ns.clearLog();
 	var lastAction = null;
 	const skillNames = ns.bladeburner.getSkillNames();
+	const cityNames = ["Sector-12", "Aevum", "Volhaven", "Chongqing", "New Tokyo", "Ishima"];
 	const types = {
 		general: "General",
 		contract: "Contract",
 		operation: "Operation",
+		blackop: "BlackOp",
 	};
 	const general = {
 		regen: "Hyperbolic Regeneration Chamber",
@@ -26,6 +28,29 @@ export async function main(ns) {
 		stealth: "Stealth Retirement Operation",
 		assassination: "Assassination",
 	};
+	var blackops = [
+		"Operation Typhoon",
+		"Operation Zero",
+		"Operation X",
+		"Operation Titan",
+		"Operation Ares",
+		"Operation Archangel",
+		"Operation Juggernaut",
+		"Operation Red Dragon",
+		"Operation K",
+		"Operation Deckard",
+		"Operation Tyrell",
+		"Operation Wallace",
+		"Operation Shoulder of Orion",
+		"Operation Hyron",
+		"Operation Morpheus",
+		"Operation Ion Storm",
+		"Operation Annihilus",
+		"Operation Ultron",
+		"Operation Centurion",
+		"Operation Vindictus",
+		//"Operation Daedalus",
+	];
 	const shouldDoOperation = function (operationType, currentAction) {
 		return currentAction.name != operationType &&
 			ns.bladeburner.getActionCountRemaining(types.operation, operationType) > 50 &&
@@ -36,7 +61,29 @@ export async function main(ns) {
 			ns.bladeburner.getActionCountRemaining(types.contract, contractType) > 50 &&
 			Math.min(...ns.bladeburner.getActionEstimatedSuccessChance(types.contract, contractType)) >= 1;
 	}
-
+	const shouldDoBlackOp = function (currentAction) {
+		blackops.reverse();
+		let output = "";
+		for (let b in blackops) {
+			if (currentAction.name != blackops[b] &&
+				ns.bladeburner.getRank() >= ns.bladeburner.getBlackOpRank(blackops[b]) &&
+				Math.min(...ns.bladeburner.getActionEstimatedSuccessChance(types.blackop, blackops[b])) >= 1) {
+				output = blackops[b];
+				break;
+			}
+		}
+		blackops.reverse();
+		return output;
+	}
+	const doBlackOp = function (blackOp) {
+		//ns.bladeburner.startAction(types.blackop, blackOp);
+		if (!ns.bladeburner.startAction(types.blackop, blackOp))
+			blackops = blackops.filter(b => b != blackOp);
+	}
+	const cityCheck = (city) =>
+		ns.bladeburner.getCityCommunities(city) > 20 &&
+		ns.bladeburner.getCityEstimatedPopulation(city) > 1_000_000 &&
+		ns.bladeburner.getCityChaos(city) < 50;
 	while (true) {
 		await ns.sleep(1_000);
 		let player = ns.getPlayer();
@@ -46,21 +93,30 @@ export async function main(ns) {
 		}
 		let currentAction = ns.bladeburner.getCurrentAction();
 		let healing = currentAction.name == general.regen;
-		if (!healing) lastAction = currentAction;
+		if (currentAction.type != types.general) lastAction = currentAction;
 		let stam = ns.bladeburner.getStamina();
 		let city = ns.bladeburner.getCity();
 		let chaos = ns.bladeburner.getCityChaos(city);
 		let skillPoints = ns.bladeburner.getSkillPoints();
-		//let contractNames = ns.bladeburner.getContractNames();
+		
+		// city health check
+		if (!cityCheck(city)) {
+			let newCities = cityNames.filter(c => c != city);
+			ns.bladeburner.switchCity(newCities[Math.random() * newCities.length]);
+			continue;
+		}
 
 		// skill points
-		for (let n in skillNames) {
-			let cost = ns.bladeburner.getSkillUpgradeCost(skillNames[n]);
-			if (cost <= skillPoints) {
-				ns.bladeburner.upgradeSkill(skillNames[n]);
+		let skillsOrdered = [];
+		for (let n in skillNames)
+			skillsOrdered.push({ name: skillNames[n], cost: ns.bladeburner.getSkillUpgradeCost(skillNames[n]) });
+		skillsOrdered.sort((a, b) => a.cost - b.cost);
+		skillsOrdered.forEach(skill => {
+			if (skill.cost <= skillPoints) {
+				ns.bladeburner.upgradeSkill(skill.name);
 				skillPoints = ns.bladeburner.getSkillPoints();
 			}
-		}
+		});
 
 		// health
 		if (!healing &&
@@ -70,35 +126,49 @@ export async function main(ns) {
 			continue; // yes, I will remove all of these once I'm certain this if-else-if is the structure
 		} else if (healing &&
 			player.hp > (player.max_hp * .75) && stam[0] > (stam[1] * .8)) {
-			if (lastAction != null) {
+			if (lastAction != null)
 				ns.bladeburner.startAction(lastAction.type, lastAction.name);
-			} else {
+			else
 				ns.bladeburner.stopBladeburnerAction();
-			}
+			
 			continue;
 		}
 
+		// low success check
 		else if ([types.contract, types.operation].includes(currentAction.type) &&
 			Math.min(...ns.bladeburner.getActionEstimatedSuccessChance(currentAction.type, currentAction.name)) < 1) {
 			ns.bladeburner.stopBladeburnerAction();
 			continue;
 		}
 
-		else if (ns.singularity.isBusy()) {
+		// busy check
+		else if (ns.singularity.isBusy() && !ns.singularity.getOwnedAugmentations(false).includes("The Blade's Simulacrum")) {
 			continue;
 		}
 
 		// chaos
-		else if (currentAction.name != general.diplomacy && chaos > 10) {
+		else if (currentAction.type != types.blackop &&
+			currentAction.name != general.diplomacy && chaos > 20) {
 			ns.bladeburner.startAction(types.general, general.diplomacy);
 			continue;
-		} else if (currentAction.name == general.diplomacy && chaos < 3) {
-			ns.bladeburner.startAction(lastAction.type, lastAction.name);
+		} else if (currentAction.name == general.diplomacy && chaos < 10) {
+			if (lastAction != null)
+				ns.bladeburner.startAction(lastAction.type, lastAction.name);
+			else
+				ns.bladeburner.stopBladeburnerAction();
+			continue;
+		}
+
+		// black ops
+		else if (healing || [types.general, types.blackop].includes(currentAction.type)) {
+			continue;
+		} else if (shouldDoBlackOp(currentAction) != "") {
+			doBlackOp(shouldDoBlackOp(currentAction));
 			continue;
 		}
 
 		// operations
-		else if (healing || [types.general, types.operation].includes(currentAction.type)) {
+		else if (healing || [types.general, types.operation, types.blackop].includes(currentAction.type)) {
 			continue;
 		} else if (shouldDoOperation(operation.assassination, currentAction)) {
 			ns.bladeburner.startAction(types.operation, operation.assassination);
@@ -121,7 +191,7 @@ export async function main(ns) {
 		}
 
 		// contracts
-		else if (healing || [types.general, types.contract].includes(currentAction.type)) {
+		else if (healing || [types.general, types.contract, types.blackop].includes(currentAction.type)) {
 			continue;
 		} else if (shouldDoContract(contract.retirement, currentAction)) {
 			ns.bladeburner.startAction(types.contract, contract.retirement);

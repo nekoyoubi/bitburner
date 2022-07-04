@@ -33,7 +33,6 @@ export async function main(ns) {
 
 	let getStat = function(stat, track) {
 		var value = 0;
-		ns.print(stat);
 		switch (stat) {
 			//case "int": value = ns.getPlayer().intelligence; break;
 			case "kar":
@@ -84,7 +83,7 @@ export async function main(ns) {
 	}
 
 	let allStats = [
-		{ "stat": "kar", "label": "Kar", "color":"#C83700", "lastValue": 0, "barValue": -54000, "element": undefined, "bar": undefined, "condition": () => !ns.gang.inGang() },
+		{ "stat": "kar", "label": "Kar", "color":"#C83700", "lastValue": 0, "barValue": -54000, "element": undefined, "bar": undefined, "condition": () => true/*!ns.gang.inGang()*/ },
 		{ "stat": "ter", "label": "Ter", "color":"#966633", "lastValue": 0, "barValue": 1, "element": undefined, "bar": undefined, "condition": () => ns.gang.inGang() },
 		// I lol'd; this already exists in the game (nearly identical too)
 		//{ "stat": "int", "label": "Int", "color":"#49A0FF", "lastValue": 0, "barValue": null, "element": undefined, "bar": undefined },

@@ -5,7 +5,7 @@ export async function main(ns) {
 	ns.disableLog("stock.sell");
 	let tradeRate = .1;
 	while (true) {
-		if (ns.getPlayer().money < 1e12) { await ns.sleep(6_000); continue; }
+		if (ns.getPlayer().money < 1e9) { await ns.sleep(6_000); continue; }
 		let symbols = ns.stock.getSymbols();
 		for (let ss in symbols) {
 			let symbol = symbols[ss];
@@ -13,14 +13,18 @@ export async function main(ns) {
 			let price = ns.stock.getPrice(symbol);
 			let maxShares = ns.stock.getMaxShares(symbol);
 			let forecast = ns.stock.getForecast(symbol);
-			if (position[0] == 0 && forecast >= (.5 + tradeRate)) {
-				let bought = ns.stock.buy(symbol, maxShares);
-				if (bought > 0) ns.print(`INFO — ${symbol}: bought at ${ns.nFormat(bought, "$0.0a")} for ${ns.nFormat(bought * maxShares, "$0.0a")}`);
+			if (false) {//position[0] < maxShares && forecast >= (.5 + tradeRate)) {
+				let available = maxShares - position[0];
+				let buy = Math.min(available, (ns.getPlayer().money * .5) / price);
+				//let buy = (maxShares - position[0]);
+				if ((buy * price) < 500_000) continue;
+				let bought = ns.stock.buy(symbol, buy);
+				if (bought > 0) ns.print(`INFO — ${symbol}: bought at ${ns.nFormat(bought, "$0.0a")} for ${ns.nFormat(bought * buy, "$0.0a")}`);
 				//continue;
 			} else if (position[0] > 0 && forecast <= .5 /*&& price > (position[1] * 1.1)*/) {
 				let amount = position[0];
 				let sold = ns.stock.sell(symbol, amount);
-				if (sold > 0) ns.print(`SELL — ${symbol}: sold at ${ns.nFormat(sold, "$0.0a")} for ${ns.nFormat(sold * amount, "$0.0a")}`);
+				if (sold > 0) ns.print(`WARN — ${symbol}: sold at ${ns.nFormat(sold, "$0.0a")} for ${ns.nFormat(sold * amount, "$0.0a")}`);
 			}
 			// if (position[0] == 0 && price < maxBuyPrice) {
 			// 	let bought = ns.stock.buy(symbol, maxShares);
