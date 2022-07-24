@@ -5,7 +5,7 @@ export async function main(ns) {
 	if (type.match(/mug(?:ging)?|1/i)) type = CRIMES.find(c => c.crime.match(/mug/i))?.crime;
 	else if (type.match(/(?:h|homicide|murder|kill|2)/i)) type = CRIMES.find(c => c.crime.match(/homicide/i))?.crime;
 	else if (type.match(/(?:bonds?|forge(?:ry)?)/i)) type = CRIMES.find(c => c.crime.match(/bond/i))?.crime;
-	else type = CRIMES.find(c => c.crime.match(new RegExp(type)))?.crime;
+	else type = CRIMES.find(c => c.crime.match(new RegExp(type)))?.crime ?? type;
 	let start = new Date();
 	let done = start.setMinutes(start.getMinutes() + (60*24));
 	while (Date.now() < done) {

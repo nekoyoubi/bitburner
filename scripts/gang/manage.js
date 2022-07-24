@@ -13,7 +13,7 @@ export async function main(ns) {
 		let name = "";
 		while(name == "" || ns.gang.getMemberNames().includes(name)) {
 			let possibleNames = Array.from(`
-				Alfa,Bravo,Charlie,Delta,Echo,Foxtrot,Golf,Hotel,India,Juliett,Kilo,Lima,Mike,November,Oscar,Papa,Quebec,Romeo,Sierra,Tango,Uniform,Victor,Whiskey,X-Ray,Zulu
+				Alfa,Bravo,Charlie,Delta,Echo,Foxtrot,Golf,Hotel,India,Juliett,Kilo,Lima,Mike,November,Oscar,Papa,Quebec,Romeo,Sierra,Tango,Uniform,Victor,Whiskey,X-Ray,Zulu,
 				Armani,Bambi,Ciro,Dom,Enzo,Franco,Gia,Hector,Isabella,Jules,Klaus,Luca,
 				Access,Backdoor,Crash,Daemon,Error,Failsafe,Gridlock,Handle,Inline,JNE,Kernel,Link,
 				`.matchAll(new RegExp(`\\b[^,]+(?=\\S)`, "gi"))).map(n => n.toString().trim());
@@ -67,6 +67,7 @@ export async function main(ns) {
 		}
 
 		// equipment loop
+		
 		members = getMembers();
 		members.forEach(async member => {
 			var filteredEquipment = equipment.filter(eq => eq.type.match(new RegExp(`Rootkit|Vehicle${(gang.isHacking && override != "combat") ? "" : "|Weapon|Armor"}`, "i")));
@@ -83,6 +84,7 @@ export async function main(ns) {
 				}
 			}
 		});
+		/**/
 		
 		// combat override task loop (probably never used again)
 		if (override == "combat") {
@@ -153,7 +155,7 @@ export async function main(ns) {
 					combat > 125 ? (combat % 10 < 3) ? tasks.strongarm : tasks.combat :
 					tasks.combat;	
 				if (member.task != task) {
-					if (warCap > 0 && combat > 200 && task != justice && members.length > 7 && powerRatio < 5)
+					if (warCap > 0 && combat > 200 && task != justice && members.length > 7 && powerRatio < 7)
 						ns.gang.setMemberTask(member.name,
 							(warCap < 0 || (((combat % 100) /* *  was /  powerRatio*/) < warRate)) ? task : tasks.war);
 					else

@@ -9,7 +9,12 @@ export async function main(ns) {
 		{ "group": 3, "city": "New Tokyo" },
 		{ "group": 3, "city": "Ishima" }
 	];
-	let backdoorServers = [ "CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z" ];
+	let backdoorServers = [
+		"CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z",
+		"blade", "b-and-a", "omnitek", "clarkinc", "4sigma", "nwo", "megacorp", "kuai-gong", "ecorp",
+		"fulcrumtech", "fulcrumassets",
+		".", "powerhouse-fitness", 
+	];
 	let autoHackFactions = [ "CyberSec", "NiteSec", "Tian Di Hui", "The Black Hand", "BitRunners", "Daedalus" ];
 	let cityFactionGroup = 0;
 	while (true) {

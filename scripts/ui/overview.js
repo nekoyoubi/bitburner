@@ -83,7 +83,7 @@ export async function main(ns) {
 	}
 
 	let allStats = [
-		{ "stat": "kar", "label": "Kar", "color":"#C83700", "lastValue": 0, "barValue": -54000, "element": undefined, "bar": undefined, "condition": () => true/*!ns.gang.inGang()*/ },
+		{ "stat": "kar", "label": "Kar", "color":"#C83700", "lastValue": 0, "barValue": -54000, "element": undefined, "bar": undefined, "condition": () => !ns.gang.inGang() },
 		{ "stat": "ter", "label": "Ter", "color":"#966633", "lastValue": 0, "barValue": 1, "element": undefined, "bar": undefined, "condition": () => ns.gang.inGang() },
 		// I lol'd; this already exists in the game (nearly identical too)
 		//{ "stat": "int", "label": "Int", "color":"#49A0FF", "lastValue": 0, "barValue": null, "element": undefined, "bar": undefined },
@@ -116,12 +116,11 @@ export async function main(ns) {
 			mainWindow.style = (doc.querySelector(overviewCollapsedSelector) == undefined)
 				? `margin-right: ${doc.querySelector(overviewSelectorBase).offsetWidth}px !important;`
 				: "margin-right: 0;";
-		let stats = allStats.filter(s => s.condition())
+		let stats = allStats.filter(s => s.condition());
 		for (let s in stats) getStat(stats[s].stat, true);
 		if (refresh) {
+			allStats.forEach(s => { s.element?.remove(); s.bar?.remove(); });
 			for (let s in stats) {
-				if (stats[s].element != undefined || !stats[s].condition()) stats[s].element.remove();
-				if (stats[s].bar != undefined || !stats[s].condition()) stats[s].bar.remove();
 				if (!stats[s].condition()) continue;
 				var textHtml = anchorText.outerHTML
 					.replace(new RegExp(`/"overview-${intOffset > 0 ? "int" : "cha"}-hook"/`,"gi"), `"overview-${stats[s].stat}-hook"`)

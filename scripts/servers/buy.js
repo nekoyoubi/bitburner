@@ -1,13 +1,18 @@
+import * as libConfig from "config.js"
+
 /** @param {NS} ns */
 export async function main(ns) {
 	ns.disableLog("sleep");
 	ns.disableLog("exec");
 	ns.disableLog("getServerMaxRam");
 	ns.disableLog("scp");
-	let maxServers = ns.getPurchasedServerLimit();
+	libConfig.init(ns);
+	/** @type {Config} */
+	let config = libConfig.load();
+	let maxServers = config.servers.maxServers ?? ns.getPurchasedServerLimit();
 	//let baseCost = 110_000;
-	let minSize = 8;
-	let maxUpgrade = ns.getPurchasedServerMaxRam(); // 65536 // 32768 // 16384 // 8192 // 4096 // 2048 // 1024 // 512 // 256;
+	let minSize = config.servers.minSize ?? 8;
+	let maxUpgrade = config.servers.maxSize ?? ns.getPurchasedServerMaxRam(); // 65536 // 32768 // 16384 // 8192 // 4096 // 2048 // 1024 // 512 // 256;
 	//ns.print(`Maximum server upgrade: ${maxUpgrade} for ${ns.nFormat(baseCost * maxUpgrade, "$(0.0a)")}`);
 	while (!ns.fileExists("map.txt")) await ns.sleep(50);
 
@@ -41,7 +46,7 @@ export async function main(ns) {
 		} else {
 			/** @type {Array<ServerMap>} */
 			let map = JSON.parse(await ns.read("map.txt"));
-			let allowed = map.filter(h => h.rooted && h.hacking <= (player.hacking * .5) && h.maxMoney > 0);
+			let allowed = map.filter(h => h.rooted && h.hacking <= Math.ceil(player.hacking * .5) && h.maxMoney > 0);
 			allowed.sort((a, b) => b.hacking - a.hacking);
 			targets = allowed.slice(0, attackScale(size)).map(h => h.host);
 		}

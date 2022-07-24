@@ -1,5 +1,22 @@
 {
+	"servers": {
+		"upgrade": true,
+		"maxServers": null,
+		"minSize": null,
+		"maxSize": null
+	},
 	"hacknet": {
-		"upgrade": false
+		"upgrade": false,
+		"autoSell": 0.995,
+		"autoBladeburner": 0.25,
+		"sellAt": 0.995,
+		"rates": {
+			"server": 0.75,
+			"upgrade": 0.5,
+			"level": 1,
+			"ram": 0.75,
+			"core": 1,
+			"cache": 1.25
+		}
 	}
 }

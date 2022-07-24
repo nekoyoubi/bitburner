@@ -23,8 +23,10 @@ export async function main(ns) {
 		//	await ns.sleep(5_000);
 		//	continue;
 		//}
-		var ht = Math.min(Math.max(Math.floor(ns.hackAnalyzeThreads(target, maxMoney / 4/*20*/)), 1), threads);
-		var gt = Math.min(Math.floor(ns.growthAnalyze(target, 4/*1.5*/, cores)), threads);
+		let div = 20;
+		let affectStock = false;
+		var ht = Math.min(Math.max(Math.floor(ns.hackAnalyzeThreads(target, maxMoney / div)), 1), threads);
+		var gt = Math.min(Math.floor(ns.growthAnalyze(target, 1 + (1 / div), cores)), threads);
 		//var wt = ns.weakenAnalyze)target, cores);
 		ns.print(`WARN — [ ${ns.nFormat(moneyNow, "0,0.0a")} / ${ns.nFormat(maxMoney, "0,0.0a")} (S:${ns.nFormat(secLevel, "0.0")} / ${ns.nFormat(minSec, "0.0")}) ]`);
 		if (secLevel > maxSec) {
@@ -34,12 +36,12 @@ export async function main(ns) {
 		}
 		else if (moneyNow < minMoney) {
 			//growResult = 
-			await ns.grow(target, { threads: /*threads*/gt, stock: true });
+			await ns.grow(target, { threads: /*threads*/gt, stock: affectStock });
 			//ns.print(`grow -> ${(growResult-1)*100}%`);
 		}
 		else {
 			//hackResult = 
-			await ns.hack(target, { threads: ht, stock: true });
+			await ns.hack(target, { threads: ht, stock: affectStock });
 			//ns.print(`hack -> ${ns.nFormat(hackResult, "($0,0.0a)")}`);
 		}
 		//await ns.sleep(Math.random() * 5_000);
