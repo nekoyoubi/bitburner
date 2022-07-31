@@ -9,7 +9,7 @@ export async function main(ns) {
 			rooted: true,
 			sniffed: false,
 			distance: 0,
-			hacking: ns.getPlayer().hacking,
+			hacking: ns.getPlayer().skills.hacking,
 			maxMoney: 0,
 			minSec: 0,
 			owner: "Nekoyoubi",

@@ -12,7 +12,7 @@ export async function main(ns) {
 	let mainWindowSelector = `${rootSelector} > div.MuiBox-root > div.MuiBox-root`;
 	let overviewCollapsedSelector = `${overviewSelectorBase}.MuiCollapse-hidden`;
 	let hpElements = doc.querySelectorAll(`${overviewSelectorTBody} > tr:nth-child(1) p`);
-	let intOffset = Math.min(ns.getPlayer().intelligence + 1, 2);
+	let intOffset = Math.min(ns.getPlayer().skills.intelligence + 1, 2);
 	let anchorText = doc.querySelector(`${overviewSelectorTBody} > tr:nth-child(${14 + intOffset})`);
 	let anchorBar = doc.querySelector(`${overviewSelectorTBody} > tr:nth-child(${15 + intOffset})`);
 	

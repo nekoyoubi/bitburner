@@ -114,12 +114,12 @@ export async function main(ns) {
 
 		// health
 		if (!healing &&
-			(player.hp < Math.max(player.max_hp * .25, 10) || stam[0] < (stam[1] * .6))) {
+			(player.hp.current < Math.max(player.hp.max * .25, 10) || stam[0] < (stam[1] * .6))) {
 			lastAction = ns.bladeburner.getCurrentAction();
 			ns.bladeburner.startAction(types.general, general.regen);
 			continue; // yes, I will remove all of these once I'm certain this if-else-if is the structure
 		} else if (healing &&
-			player.hp > (player.max_hp * .75) && stam[0] > (stam[1] * .8)) {
+			player.hp.current > (player.hp.max * .75) && stam[0] > (stam[1] * .8)) {
 			if (lastAction != null)
 				ns.bladeburner.startAction(lastAction.type, lastAction.name);
 			else

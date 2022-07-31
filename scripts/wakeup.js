@@ -2,9 +2,9 @@
 export async function main(ns) {
 	let scripts = [ 
 		{ r:16, s:[ "map", ] },
-		{ r:32, s:[ "unlock", "[train]", /**/ ] },
-		{ r:64, s:[ "ui/overview", "darkweb", "hacknet", "servers/buy", /*"market/start_history", */ ] },
-		{ r:128, s:[ "factions", "cct", /*"gang/manage", "market", */ ] },
+		{ r:32, s:[ "unlock", "[train]", "servers/buy", /**/ ] },
+		{ r:64, s:[ "ui/overview", "darkweb", "hacknet", /*"market/start_history", */ ] },
+		{ r:128, s:[ "factions", "cct", "gang/manage", /*"market", */ ] },
 		{ r:256, s:[ "bladeburner", ] },
 	];
 	while (scripts.length > 0) {
@@ -24,7 +24,7 @@ export async function main(ns) {
 			}
 		}
 		scripts = scripts.filter(s => s.r > ram);
-		await ns.sleep(60_000);
+		await ns.sleep(5_000);
 	}
 	//let scripts = [ , "buyservers" /*"darkweb", "hacknet"*/ ];
 }

@@ -8,6 +8,7 @@ export async function main(ns) {
 		}
 		let index = parseInt(ns.args[1]);
 		let augs = ns.sleeve.getSleevePurchasableAugs(index).filter(a => a.cost < 1e12);
+		ns.tprint(JSON.stringify(augs));
 		for (let a in augs) {
 			ns.sleeve.purchaseSleeveAug(index, augs[a].name);
 		}

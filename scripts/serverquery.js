@@ -23,7 +23,7 @@ export async function main(ns) {
 	var limit = ns.args.indexOf("-n") > -1 ? ns.args[ns.args.indexOf("-n") + 1] : "";
 	ns.run("map.js"); while (!ns.fileExists("map.txt") && !ns.isRunning("map.js", "home")) await ns.sleep(50);
 	/** @type {Array<ServerMap>} */
-	var map = JSON.parse(await ns.read("map.txt"));
+	var map = JSON.parse(ns.read("map.txt"));
 	if (order != "") {
 		map.sort(function(a,b) {
 			let v = 0;

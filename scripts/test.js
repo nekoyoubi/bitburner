@@ -1,6 +1,21 @@
 /** @param {NS} ns */
 export async function main(ns) {
-	ns.tprint(ns.bladeburner.getActionEstimatedSuccessChance("BlackOp", "Operation X"));
+	//let augs = JSON.parse(ns.read("augs.txt"));
+	//ns.tprint(augs.map(a => a.name));
+	ns.tprint(ns.bladeburner.getActionEstimatedSuccessChance("blackop", "Operation Typhoon"));
+	ns.tprint(ns.sleeve.getSleevePurchasableAugs(0));
+	//ns.tprint(ns.bladeburner.getActionEstimatedSuccessChance("BlackOp", "Operation K"));
+	//ns.tprint(ns.bladeburner.getSkillLevel("Overclock"));
+	//ns.tprint(ns.formulas.hacking.growTime(ns.getServer("joesguns"), ns.getPlayer()));
+	//ns.tprint(ns.formulas.hacking.hackTime(ns.getServer("joesguns"), ns.getPlayer()));
+	//let augs = ns.sleeve.getSleevePurchasableAugs(2);
+	//ns.tprint(`${ns.nFormat(augs.filter(a => a.cost < 1e12).reduce((a,b) => a + b.cost, 0), "0.0a")}`);
+
+	// if (ns.hacknet.numHashes() > 4)
+	// 	for (let s = 0; s < Math.max(ns.hacknet.numHashes() / 4, 1); s++)
+	// 		ns.hacknet.spendHashes("Sell for Money");
+
+	//ns.tprint(ns.getPlayer().("BlackOp", "Operation X"));
 	//let otherGangs = ns.gang.getOtherGangInformation();
 	//ns.tprint(`${ns.nFormat(ns.bladeburner.getCityEstimatedPopulation("Aevum"), "0,0")}`);
 	//ns.tprint(ns.getPlayer().workType);

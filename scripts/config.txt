@@ -1,4 +1,33 @@
 {
+	"backdoor": {
+		"faction": true,
+		"faction_list": [
+			"CSEC",
+			"avmnite-02h",
+			"I.I.I.I",
+			"run4theh111z"
+		],
+		"company": false,
+		"company_list": [
+			"4sigma",
+			"b-and-a",
+			"blade",
+			"clarkinc",
+			"ecorp",
+			"fulcrumassets",
+			"fulcrumtech",
+			"kuai-gong",
+			"megacorp",
+			"nwo",
+			"omnitek"
+		],
+		"other": true,
+		"other_list": [
+			".",
+			"powerhouse-fitness"
+		],
+		"bitnode": false
+	},
 	"servers": {
 		"upgrade": true,
 		"maxServers": null,
@@ -9,7 +38,7 @@
 		"upgrade": false,
 		"autoSell": 0.995,
 		"autoBladeburner": 0.25,
-		"sellAt": 0.995,
+		"sellAt": 0.1,
 		"rates": {
 			"server": 0.75,
 			"upgrade": 0.5,

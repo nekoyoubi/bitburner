@@ -9,15 +9,16 @@ export async function main(ns) {
 		{ "group": 3, "city": "New Tokyo" },
 		{ "group": 3, "city": "Ishima" }
 	];
-	let backdoorServers = [
-		"CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z",
-		"blade", "b-and-a", "omnitek", "clarkinc", "4sigma", "nwo", "megacorp", "kuai-gong", "ecorp",
-		"fulcrumtech", "fulcrumassets",
-		".", "powerhouse-fitness", 
-	];
+	// let backdoorServers = [
+	// 	"CSEC", "avmnite-02h", "I.I.I.I", "run4theh111z",
+	// 	"blade", "b-and-a", "omnitek", "clarkinc", "4sigma", "nwo", "megacorp", "kuai-gong", "ecorp",
+	// 	"fulcrumtech", "fulcrumassets",
+	// 	".", "powerhouse-fitness", 
+	// ];
 	let autoHackFactions = [ "CyberSec", "NiteSec", "Tian Di Hui", "The Black Hand", "BitRunners", "Daedalus" ];
 	let cityFactionGroup = 0;
 	while (true) {
+		let config = JSON.parse(ns.read("config.txt"));
 		var message = "";
 		let invitations = ns.singularity.checkFactionInvitations();
 		let factions = ns.getPlayer().factions;
@@ -38,12 +39,17 @@ export async function main(ns) {
 			ns.toast(message);
 		}
 		/** @type {Array<ServerMap>} */
-		let map = JSON.parse(await ns.read("map.txt"));
-		let factionServers = map.filter(h => h.rooted && !h.backdoored && backdoorServers.includes(h.host))
-		for (let s in factionServers) {
-			message = `WARN — backdooring ${factionServers[s].host} for faction invitation`
+		let map = JSON.parse(ns.read("map.txt"));
+		let backdoorServers = map.filter(h => h.rooted && !h.backdoored && (
+			(config.backdoor.faction && config.backdoor.faction_list.includes(h.host)) ||
+			(config.backdoor.company && config.backdoor.company_list.includes(h.host)) ||
+			(config.backdoor.other && config.backdoor.other_list.includes(h.host))
+		));			
+		for (let s in backdoorServers) {
+			message = `WARN — backdooring ${backdoorServers[s].host}`
 			ns.print(message);
-			ns.run("goto.js", 1, factionServers[s].host);
+			ns.tprint(message);
+			ns.run("goto.js", 1, backdoorServers[s].host);
 			await ns.sleep(1000);
 			await ns.singularity.installBackdoor();
 			ns.run("goto.js", 1, "home");

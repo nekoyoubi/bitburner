@@ -150,8 +150,10 @@ export async function main(ns) {
 					combat > 2000 ? (combat % 10 < 7) ? tasks.humans : tasks.terror :
 					combat > 1500 ? (combat % 10 < 5) ? tasks.humans : tasks.arms :
 					combat > 1000 ? (combat % 10 < 7) ? tasks.arms : tasks.combat :
-					combat > 500 ? (combat % 10 < 7) ? tasks.arms : tasks.combat :
-					combat > 250 ? (combat % 10 < 5) ? tasks.robbery : tasks.combat :
+					combat > 750 ? (combat % 10 < 5) ? tasks.arms : tasks.combat :
+					combat > 600 ? (combat % 10 < 7) ? tasks.robbery : tasks.combat :
+					combat > 400 ? (combat % 10 < 3) ? tasks.robbery : tasks.combat :
+					combat > 300 ? (combat % 10 < 7) ? tasks.strongarm : tasks.combat :
 					combat > 125 ? (combat % 10 < 3) ? tasks.strongarm : tasks.combat :
 					tasks.combat;	
 				if (member.task != task) {

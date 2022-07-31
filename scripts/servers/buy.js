@@ -38,15 +38,15 @@ export async function main(ns) {
 		while (!ns.serverExists(server)) await ns.sleep(100);
 		await ns.scp("attack.js", server);
 		await ns.scp("goto.js", server);
-		let targetFile = await ns.read("target.txt");
+		let targetFile = ns.read("target.txt");
 		/** @type {Array<string>} host names to target */
 		var targets = [ ];
 		if (targetFile.length > 0) {
 			targets = [ ...targetFile.match(/[^,;\s]+/g) ];
 		} else {
 			/** @type {Array<ServerMap>} */
-			let map = JSON.parse(await ns.read("map.txt"));
-			let allowed = map.filter(h => h.rooted && h.hacking <= Math.ceil(player.hacking * .5) && h.maxMoney > 0);
+			let map = JSON.parse(ns.read("map.txt"));
+			let allowed = map.filter(h => h.rooted && h.hacking <= Math.ceil(player.skills.hacking * .5) && h.maxMoney > 0);
 			allowed.sort((a, b) => b.hacking - a.hacking);
 			targets = allowed.slice(0, attackScale(size)).map(h => h.host);
 		}

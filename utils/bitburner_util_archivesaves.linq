@@ -12,13 +12,14 @@ void Main()
 {
 	var saves = Util.LoadString(KEY_PATH_SAVES) ?? SaveString(KEY_PATH_SAVES, Util.ReadLine(MESSAGE_PATH_SAVES));
 	var files = Directory.GetFiles(saves, "bitburnerSave_*.json");
+	files = files.Concat(Directory.GetFiles(saves, "RECOVERY_BITBURNER_*.json")).ToArray();
 	foreach (var file in files)
 	{
 		var info = new FileInfo(file);
 		var archiveFolder = $@"{saves}archive\{info.LastWriteTime:yyyy\\MM\\dd\\}";
 		if (info.LastWriteTime < DateTime.Today)
 		{
-			Util.HorizontalRun(true, Util.Metatext($"{file} -> "), new Hyperlinq(archiveFolder)).Dump();
+			Util.HorizontalRun(true, Util.Metatext($"{Path.GetFileName(file)} -> "), new Hyperlinq(archiveFolder)).Dump();
 			if (!Directory.Exists(archiveFolder)) Directory.CreateDirectory(archiveFolder);
 			File.Move(file, Path.Combine(archiveFolder, Path.GetFileName(file)));	
 		}

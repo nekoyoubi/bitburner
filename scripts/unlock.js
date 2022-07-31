@@ -8,13 +8,13 @@ export async function main(ns) {
 		let player = ns.getPlayer();
 		//ns.run("map.js");
 		while (!ns.fileExists("map.txt")) await ns.sleep(50);
-		var map = JSON.parse(await ns.read("map.txt"));
-		let breakThem = map.filter(h => !h.rooted && h.hacking <= player.hacking);
-		let hackThem = map.filter(h => h.rooted && h.hacking <= (player.hacking * .5) && h.maxMoney > 0);
+		var map = JSON.parse(ns.read("map.txt"));
+		let breakThem = map.filter(h => !h.rooted && h.hacking <= player.skills.hacking);
+		let hackThem = map.filter(h => h.rooted && h.hacking <= (player.skills.hacking * .5) && h.maxMoney > 0);
 		hackThem.sort((a, b) => b.hacking - a.hacking);
 		let hackTargets = hackThem.slice(0, 3).map(h => h.host);
 		done = map.filter(h => !h.rooted).length < 1;
-		let targetOverride = await ns.read("target.txt");
+		let targetOverride = ns.read("target.txt");
 		if (targetOverride.length > 0)
 			hackTargets = [ ...targetOverride.match(/[^,;\s]+/g) ];
 		for (let b in breakThem) {

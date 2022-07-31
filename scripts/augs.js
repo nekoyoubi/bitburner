@@ -1,6 +1,6 @@
 /** @param {NS} ns */
 export async function main(ns) {
-	let purchaseAugs = ns.args.find(a => a.toString().match(/-[pb]/i)) != undefined;
+	let purchaseAugs = ns.args.find(a => a.toString().match(/-[b]/i)) != undefined;
 	let includeAugs = ns.args.find(a => a.toString().match(/-a/)) != undefined
 		? ns.args[ns.args.findIndex(a => a.toString().match(/-a/)) + 1]
 		: ".*";
@@ -26,6 +26,9 @@ export async function main(ns) {
 		? ns.args[ns.args.findIndex(a => a.toString().match(/-[r]/i)) + 1]
 		: 100;
 	let buyMost = ns.args.find(a => a.toString().match(/-m/i)) != undefined;
+	let prepurchased = ns.args.find(a => a.toString().match(/-p/i)) != undefined
+		? ns.args[ns.args.findIndex(a => a.toString().match(/-p/)) + 1]
+		: 0;
 	var player = ns.getPlayer();
 	/** @type {Array<Aug>} */
 	var augs = [];
@@ -112,22 +115,25 @@ export async function main(ns) {
 		// }
 		return (noStats || (doesInclude && doesExclude && good));
 	});
-	
 	let canBuy = augs.filter(a =>
 		!a.owned &&
 		a.cost <= player.money &&
-		a.factions.filter(f => ns.singularity.getFactionRep(f) >= a.rep).length > 0 &&
-		a.prereqs.every(p => ns.singularity.getOwnedAugmentations(true).includes(p))
+		a.factions.some(f => ns.singularity.getFactionRep(f) >= a.rep) &&
+		!a.prereqs.some(p => !ns.singularity.getOwnedAugmentations(true).includes(p))
 	);
+	//let prereqs = canBuy.filter(a => a.prereqs.filter(p => !ns.singularity.getOwnedAugmentations(true).includes(p)));
+	//ns.tprint(prereqs);
+	//canBuy = canBuy.filter(a => prereqs.includes(a.name));
 	let buySoA = chooseSoA(canBuy.filter(s => s.name.startsWith("SoA - ")).map(s => s.name));
 	if (buySoA != null) canBuy = canBuy.filter(a => !a.name.startsWith("SoA - ") || a.name == buySoA);
-	canBuy.sort((a,b) => b.cost - a.cost);
+	canBuy.sort((a,b) => b.cost - a.cost).sort((a,b) => a.name.startsWith("SoA - ") - b.name.startsWith("SoA - "));
 	let purchaseMap = [];
 	//let testBuy = canBuy;
 	do {
 		if (canBuy.length < 1) break;
 		var money = player.money;
-		var multiplier = 1;
+		var multRate = (1.9 - (1.9 * .07));
+		var multiplier = prepurchased == 0 ? 1 : prepurchased * multRate;
 		let lens = {
 			"name": Math.max(...canBuy.map(a => a.name.length)),
 			"cost": 8,
@@ -144,14 +150,26 @@ export async function main(ns) {
 			}
 			let cost = aug.name.startsWith("SoA - ") ? aug.cost : aug.cost * multiplier;
 			let faction = aug.factions.filter(f => ns.singularity.getFactionRep(f) >= aug.rep)[0];
-			if (money >= cost && cost <= lastCost * rateCap) {
+			/*
+			let prereqsNeeded = aug.prereqs.filter(a =>
+				prereqs.some(p => p.name == a) &&
+				!ns.singularity.getOwnedAugmentations(true).includes(a));
+			if (prereqsNeeded.length > 0)
+				ns.tprint(`${aug.name} - ${JSON.stringify(prereqsNeeded)}`);
+			*/
+			if (money >= cost && cost <= lastCost * rateCap /*&& prereqsNeeded.length == 0*/) {
 				augmentsPurchased++;
 				moneySpent += cost;
 				lastCost = cost;
 				let message = `${aug.name.padStart(lens.name, " ")} — ${ns.nFormat(cost, "$0.0a").padEnd(lens.cost, " ")} — ${faction}`;
 				money -= cost;
-				multiplier *= 1.9;
+				multiplier *= multRate;
 				shoppingList.push({ "faction": faction, "aug": aug.name, "cost": cost, "message": message, "stats": aug.stats });
+				/*
+				if (prereqs.some(p => p.name == aug.name)) {
+					prereqs = prereqs.filter(a => a.name != aug.name);	
+				}
+				*/
 			}
 		}
 		purchaseMap.push(shoppingList);
@@ -184,15 +202,47 @@ export async function main(ns) {
 	}
 	let statKeys = Object.keys(stats);
 	statKeys.sort((a, b) => a.localeCompare(b));
+	let statDisplay = [];
 	for (let k in statKeys) {
 		let keyName = statKeys[k]
 			.replace(/[_]/g, " ")
 			.replace(/(hacking|strength|defense|dexterity|agility|charisma)$/gi, "$1 Skill")
 			.replace(/\b([a-z])/g, m => m.toUpperCase());
-		ns.tprint(`${keyName}: ${ns.nFormat(stats[statKeys[k]] - 1, "0.??%")}`);
+		let main = keyName.match(/^\w+/).toString()
+			.replace(/Work|Company/, "Company")
+		let sub = keyName.match(/(?<=\s).+/).toString().replace("Exp", "XP");
+		if (true)
+			sub = sub
+				.replace("XP", "💡")
+				.replace("Skill", "📊")
+				.replace("Rep", "❤️")
+				.replace(/(?:Node\s)?Money/, "💵"/*"💰""💲"*/)
+				.replace("Grow", "📈"/*"↗️"*/)
+				.replace("Speed", "⏱️")
+				.replace("Analysis", "🕵️")
+				.replace("Stamina Gain", "⚡")
+				.replace("Max Stamina", "🏃🏽")
+				.replace(/Success Chance|Success|Chance/, "🎲");
+		statDisplay.push({ "main": main, "sub": sub,"full": keyName,"value": stats[statKeys[k]] - 1 });
 	}
+	let statLines = [];
+	for (let s in statDisplay) {
+		let stat = statDisplay[s];
+		let valueFormat = `${stat.sub} ${ns.nFormat(stat.value, "0.??%")}`;
+		if (statLines.filter(l => l.startsWith(stat.main)).length == 0) {
+			statLines.push(`${stat.main} ${valueFormat}`);
+		} else {
+			let li = statLines.findIndex(l => l.startsWith(stat.main));
+			statLines[li] = `${statLines[li]} ${valueFormat}`;
+		}
+	}
+	//ns.tprint(statLines);
+	for (let l in statLines)
+		ns.tprint(statLines[l]);
 	//ns.tprint(`${JSON.stringify(stats, null, "  ")}`);
 	ns.tprint(`========== total stats gained ==========`);
+	//ns.tprint(JSON.stringify(purchaseMap.map(p => p.length), null, "  "));
+	//ns.tprint(`========== all shopping lists ==========`);
 }
 
 function chooseSoA(soas) {
